@@ -1,0 +1,23 @@
+{
+  "id": "identity-api",
+  "swagger": "/identity.yaml",
+  "navigationLabel": "Compliance API",
+  "description": "Documentation to support the Identity interactions.",
+  "md": [
+    {
+      "id": "introduction",
+      "navigationLabel": "Introduction",
+      "path": "/md/introduction.md"
+    },
+    {
+      "id": "versions",
+      "navigationLabel": "Version History",
+      "path": "/md/versioning.md"
+    },
+    {
+      "id": "legal-information",
+      "navigationLabel": "Legal Information",
+      "path": "/md/legal-information.md"
+    }
+  ]
+}

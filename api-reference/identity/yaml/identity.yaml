@@ -1,0 +1,1149 @@
+openapi: "3.0.2"
+info:
+  title: Fondy Client API
+  version: "2.1.0"
+  description: ""
+servers:
+  - url: https://api.fondy.io/clientapi/{clientRef}/encrypted
+
+# ====================================
+# PATHS -> what can be called in the API
+# ====================================
+paths:
+
+  # ====================================
+  # Compliance
+  # ====================================
+  /onboarding/compliace/profile:
+    post:
+      parameters:
+        - $ref: '#/components/parameters/Host'
+        - $ref: '#/components/parameters/Date'
+      description: |
+        Creates an compliance profile in the system
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/complianceProfile'
+        required: false
+      responses:
+        200:
+          description: The created compliance profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/complianceProfile'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /onboarding/compliace/profile/{profile_id}:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/Host'
+        - $ref: '#/components/parameters/Date'
+        - name: profile_id
+          in: path
+          description: The UUID of the fondy compliance profile
+          required: true
+          schema:
+            maxLength: 36
+            minLength: 36
+            type: string
+      description: |
+        Creates a compliance profile in the system
+      responses:
+        200:
+          description: The compliance profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/complianceProfile'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  # ====================================
+  # Identity
+  # ====================================
+  /onboarding/identity:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/Host'
+        - $ref: '#/components/parameters/Date'
+      description: |
+        get all identities that you have created.
+      responses:
+        200:
+          description: array of identities for your customer reference
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/identity'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      parameters:
+        - $ref: '#/components/parameters/Host'
+        - $ref: '#/components/parameters/Date'
+      description: |
+        Creates an identity in the system
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/identity'
+        required: false
+      responses:
+        200:
+          description: The created identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /onboarding/identity{identity_id}:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/Host'
+        - $ref: '#/components/parameters/Date'
+        - name: identity_id
+          in: path
+          description: The UUID of the fondy identity
+          required: true
+          schema:
+            maxLength: 36
+            minLength: 36
+            type: string
+      description: |
+        gets an identity in the system
+      responses:
+        200:
+          description: Gets the requested Identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identity'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+# ====================================
+# Components -> used in all of the above
+# ====================================
+components:
+  # ====================================
+  # Various objects to be used above
+  # ====================================
+  schemas:
+    # ~~~~~~~~~~~~~~~
+    # Various defined objects for consistency
+    # ~~~~~~~~~~~~~~~
+
+    # String Date representation
+    StringDate:
+      description: A String version of the date in the format yyyy-dd-mm
+      type: string
+      maxLength: 10
+      minLength: 10
+      example: 1970-12-31
+
+    #To and from dates
+    Dates:
+      type: object
+      description: Dates of "to and from"
+      properties:
+        date_to :
+          $ref: '#/components/schemas/StringDate'
+          description: |
+            the "end" date for this object in yyyy-dd-mm format
+          example: 1970-12-31
+        date_from :
+          $ref: '#/components/schemas/StringDate'
+          description: |
+            the starting date for this object in yyyy-dd-mm format
+          example: 1970-12-31
+
+    #Audit Dates
+    AuditDates:
+      type: object
+      description: Dates of "to and from"
+      properties:
+        created :
+          $ref: '#/components/schemas/DateTime'
+        updated :
+          $ref: '#/components/schemas/DateTime'
+
+    #Terms of service
+    TermsOfService :
+      type: object
+      description: Terms of service -> this must be set to true, and you accept them
+      properties:
+        tos_accepted_date:
+          $ref: '#/components/schemas/StringDate'
+          description: |
+            the "end" date for this object in yyyy-dd-mm format
+          example: 1970-12-31
+        tos_accepted:
+          type: boolean
+          description: True, means they have been accepted
+
+    Compliance :
+      type: object
+      description: Compliance -> this must be set as you must have undertaken compliance, see the Terms Of Service
+      properties:
+        screened:
+          type: string
+          maxLength: 20
+          minLength: 1
+          description: The type of company number
+          example: CLIENT
+          enum:
+            - CLIENT
+            - FONDY
+            - EXTERNAL
+            - FONDY_AND_CLIENT
+            - ALL
+        risk_rated:
+          type: string
+          maxLength: 20
+          minLength: 1
+          description: The type of company number
+          example: CLIENT
+          enum:
+            - CLIENT
+            - FONDY
+            - EXTERNAL
+            - FONDY_AND_CLIENT
+            - ALL
+
+    #Terms of service
+    Country:
+      type: object
+      description: Country object of name and ISO code
+      properties:
+        country:
+          description: |
+            String representation of the country name. Does not have to be the ISO official name and can be 
+            a "subdivision" -> example United Kingdom, England, etc..
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: England
+        code:
+          description: ISO:3166-1 two digit country code
+          type: string
+          maxLength: 2
+          minLength: 2
+          example: GB
+
+    #the nationality or residency of a person.
+    ResidencyNationality:
+      type: array
+      description: Details of Residency or Nationalities
+      items:
+        type: object
+        properties:
+          id:
+            $ref: '#/components/schemas/Uuid'
+          country:
+            $ref: '#/components/schemas/Country'
+          dates:
+            $ref: '#/components/schemas/Dates'
+          status:
+            type: string
+            maxLength: 12
+            minLength: 1
+            description: |
+              status of this record.
+            example: CURRENT
+            enum:
+              - CURRENT
+              - HISTORIC
+              - KNOWN
+              - ALIAS
+              - POSSIBLE
+
+    Documentation:
+      type: array
+      description: Details of Residency or Nationalities
+      items:
+        type: object
+        properties:
+          id:
+            $ref: '#/components/schemas/Uuid'
+          country:
+            $ref: '#/components/schemas/Country'
+          dates:
+            $ref: '#/components/schemas/Dates'
+          status:
+            type: string
+            maxLength: 12
+            minLength: 1
+            description: |
+              status of this record.
+            example: CURRENT
+            enum:
+              - CURRENT
+              - HISTORIC
+              - KNOWN
+              - ALIAS
+              - POSSIBLE
+          document_type:
+            type: string
+            maxLength: 36
+            minLength: 0
+            description: The type of id references (e.g. passport)
+          reference_of_document:
+            type: string
+            maxLength: 36
+            minLength: 1
+            description: The type of id references (e.g. passport number)
+
+
+
+    #Details for a person
+    PersonDetails:
+      type: object
+      description: All relevant details of Person information
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of this record
+          readOnly: true
+        title:
+          type: string
+          maxLength: 6
+          minLength: 1
+          description: |
+            the persons title
+          example: PROF
+          enum:
+            - PROF
+            - Dr
+            - Ref
+            - Mr
+            - Mrs
+            - Ms
+            - Other
+        surname:
+          type: string
+          maxLength: 100
+          minLength: 1
+          description: |
+            the persons surname
+          example: Example-Surname
+        firstname:
+          type: string
+          maxLength: 100
+          minLength: 1
+          description: |
+            the persons first
+          example: ExampleFirstname
+        other_names:
+          type: string
+          maxLength: 100
+          minLength: 1
+          description: |
+            the persons "other" names -> specifically things like the middle name
+          example: Example-Surname
+        gender:
+          type: string
+          maxLength: 6
+          minLength: 1
+          description: |
+            the persons gender
+          example: FEMALE
+          enum:
+            - MALE
+            - FEMALE
+            - NA
+            - OTHER
+        married:
+          type: string
+          maxLength: 10
+          minLength: 1
+          description: |
+            the persons marital status
+          example: YES
+          enum:
+            - YES
+            - NO
+            - SEPARATED
+            - DIVORCED
+            - WIDOWED
+        dates:
+          $ref: '#/components/schemas/Dates'
+          description: the dates to and from
+          readOnly: true
+        status:
+          type: string
+          maxLength: 10
+          minLength: 1
+          description: |
+            the status of this record
+          example: CURRENT
+          enum:
+            - CURRENT
+            - HISTORIC
+            - KNOWN
+            - OTHER
+
+    # UUID
+    Uuid:
+      type: string
+      maxLength: 36
+      minLength: 36
+      example: 43971e26-61b1-420b-9add-c510d44a354f
+
+    # External reference (ID, or set name etc..)
+    ExternalRef:
+      type: string
+      maxLength: 100
+      minLength: 0
+      example: ExampleRefId_43971e26-61b1-420b-9add-c510d44a354f
+
+    #DateTime
+    DateTime:
+      type: string
+      format: date-time
+      example: '2020-01-22T13:15:30Z'
+
+    #Address Object
+    Address:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of this record
+          readOnly: true
+        external_id:
+          $ref: '#/components/schemas/ExternalRef'
+          description: external (your) ref of this record
+          readOnly: true
+        full_address:
+          type: string
+          maxLength: 2000
+          minLength: 1
+          example: 123 Example House, example road, Example town, UK
+        address_line_1:
+          type: string
+          maxLength: 100
+          minLength: 1
+          example: 123 Example House
+        address_line_2:
+          type: string
+          maxLength: 100
+          minLength: 0
+          example: Example Road
+        address_line_3:
+          type: string
+          maxLength: 100
+          minLength: 0
+          example: Example Small Hamlet
+        address_line_4:
+          type: string
+          maxLength: 100
+          minLength: 0
+          example: Example Village
+        town:
+          type: string
+          maxLength: 100
+          minLength: 1
+          example: Example Large Town
+        state:
+          type: string
+          maxLength: 100
+          minLength: 0
+          example: Middlesex
+        postcode:
+          type: string
+          maxLength: 10
+          minLength: 1
+          example: EX1 1EG
+        country:
+          $ref: '#/components/schemas/Country'
+        type:
+          type: string
+          maxLength: 20
+          minLength: 1
+          description: The payment type (transfer or payout)
+          example: REGISTERED_OFFICE
+          enum:
+            - PERSONAL
+            - OFFICE
+            - REGISTERED_OFFICE
+            - BUSINESS
+            - OTHER
+        status:
+          type: string
+          maxLength: 12
+          minLength: 1
+          description: |
+            status of this record.
+          example: CURRENT
+          enum:
+            - CURRENT
+            - HISTORIC
+            - KNOWN
+            - POSSIBLE
+        dates:
+          $ref: '#/components/schemas/Dates'
+
+    #telephone
+    Telephone:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of this record
+          readOnly: true
+        valid:
+          type: boolean
+          description: is this item is still valid
+        primary:
+          type: boolean
+          description: is this item the primary contact route
+        confirmed:
+          type: boolean
+          description: is this item confirmed
+        details_confirmed_by:
+          type: string
+          maxLength: 12
+          minLength: 1
+          description: |
+            who confirmed this number and details in this record
+          example: CLIENT
+          enum:
+            - CLIENT
+            - FONDY
+            - EXTERNAL
+            - OTHER
+        routing_type:
+          type: string
+          maxLength: 12
+          minLength: 1
+          description: |
+            type of number
+          example: MOBILE
+          enum:
+            - MOBILE
+            - LANDLINE
+            - VIRTUAL
+            - OTHER
+        number_type:
+          type: string
+          maxLength: 20
+          minLength: 1
+          description: The payment type (transfer or payout)
+          example: REGISTERED_OFFICE
+          enum:
+            - PERSONAL
+            - OFFICE
+            - REGISTERED_OFFICE
+            - BUSINESS
+            - OTHER
+        number:
+          type: array
+          items:
+            type: object
+            properties:
+              tel_type:
+                type: string
+                enum:
+                  - LOCAL
+                  - INTERNATIONAL
+                example: LOCAL
+              tel_number:
+                type: string
+                example: 07117 754764
+        country:
+          $ref: '#/components/schemas/Country'
+
+    #EMAIL
+    Email:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of this record
+          readOnly: true
+        valid:
+          type: boolean
+          description: is this item is still valid
+        primary:
+          type: boolean
+          description: is this item the primary contact route
+        confirmed:
+          type: boolean
+          description: is this item confirmed
+        details_confirmed_by:
+          type: string
+          maxLength: 12
+          minLength: 1
+          description: |
+            who confirmed this number and details in this record
+          example: CLIENT
+          enum:
+            - CLIENT
+            - FONDY
+            - EXTERNAL
+            - OTHER
+        email_type:
+          type: string
+          maxLength: 20
+          minLength: 1
+          description: The payment type (transfer or payout)
+          example: REGISTERED_OFFICE
+          enum:
+            - PERSONAL
+            - OFFICE
+            - REGISTERED_OFFICE
+            - BUSINESS
+            - OTHER
+        email:
+          type: string
+          maxLength: 100
+
+    # UBO RECORD
+    UBO:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of this record
+          readOnly: true
+        ubo_identity_id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of the identity that the UBO is
+          readOnly: true
+        ubo_type:
+          type: string
+          maxLength: 20
+          minLength: 1
+          description: The type of UBO
+          example: DIRECTOR
+          enum:
+            - PARENT
+            - GUARDIAN
+            - SHAREHOLDER
+            - COURT_APPOINTED
+            - DIRECTOR
+            - ASSOCIATE
+            - OTHER
+        dates:
+          $ref: '#/components/schemas/Dates'
+        audit_dates:
+          $ref: '#/components/schemas/AuditDates'
+
+    # ~~~~~~~~~~~~~~~
+    # Schemas (complex objects)
+    # ~~~~~~~~~~~~~~~
+
+    #Details for a person
+    Person:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of this record
+          readOnly: true
+        external_id:
+          $ref: '#/components/schemas/ExternalRef'
+          description: external (your) ref of this record
+        date_of_birth:
+          $ref: '#/components/schemas/StringDate'
+          description: |
+            the legal date of birth for this person
+          example: 1990-02-28
+        details:
+          $ref: '#/components/schemas/PersonDetails'
+          description: the active/best known person details
+        fatca:
+          type: boolean
+          description: True, means they are fatca required
+        aliases:
+          $ref: '#/components/schemas/PersonDetails'
+          description: other details of the person -> historic, aliases, AKAs setc..
+        identity_references:
+          $ref: '#/components/schemas/Documentation'
+          description: Details of Identity References
+        nationality:
+          $ref: '#/components/schemas/ResidencyNationality'
+          description: Details of Nationalities
+        residency:
+          $ref: '#/components/schemas/ResidencyNationality'
+          description: Details of Residency
+        audit_dates:
+          description: the dates of certain actions
+          readOnly: true
+          $ref: '#/components/schemas/AuditDates'
+
+    #Details for an organisation
+    Organisation:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of this record
+          readOnly: true
+        external_id:
+          $ref: '#/components/schemas/ExternalRef'
+          description: external (your) ref of this record
+          readOnly: true
+        company_name:
+          type: string
+          maxLength: 100
+          minLength: 1
+          description: |
+            The name of the company (the reference that is used day to day)
+        company_number:
+          type: array
+          description: all/any company number (e.g. vat, tax etc..)
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                maxLength: 20
+                minLength: 1
+                description: The type of company number
+                example: COMPANY_HOUSE
+                enum:
+                  - COMPANY_HOUSE
+                  - REGISTRATION_NUMBER
+                  - D_AND_B
+                  - VAT
+                  - OTHER
+              value:
+                type: string
+                maxLength: 50
+                minLength: 1
+                description: The  number as string
+              country_of_number:
+                $ref: '#/components/schemas/Country'
+              dates:
+                $ref: '#/components/schemas/Dates'
+        type_of_organisation:
+          type: string
+          maxLength: 20
+          minLength: 1
+          description: The type of company number
+          example: LIMITED_COMPANY
+          enum:
+            - SOLE_TRADER
+            - LIMITED_COMPANY
+            - PARTNERSHIP
+            - LTD_PARTNERSHIP
+            - LLP
+            - OTHER
+        fatca:
+          type: boolean
+          description: True, means they are fatca required
+
+    #complaince profile
+    complianceProfile:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of this record
+          readOnly: true
+        external_id:
+          $ref: '#/components/schemas/ExternalRef'
+          description: external (your) ref of this record
+        external_url_validation:
+          type: string
+          description: The url to undertake the external Compliance Data
+        client_ref:
+          $ref: '#/components/schemas/Uuid'
+          description: the client ref
+          readOnly: true
+        type_of_compliance:
+          type: string
+          description: The type of compliance
+          example: EXTERNAL_FULL
+          enum:
+            - EXTERNAL_FULL
+            - FONDY
+            - OTHER
+          readOnly: true
+        profile_type:
+          type: string
+          description: The type of the profile this compliance is for
+          example: SOLETRADER
+          enum:
+            - SOLETRADER
+            - EXTERNALLY_MANAGED
+            - FREELANCER
+            - COMPANY
+            - OTHER
+        full_name:
+          type: string
+          description: The name of the organisation/person/etc..
+        email:
+          type: string
+          description: The contact email of the organisation/person/etc..
+        telephone:
+          type: string
+          description: The contact email of the organisation/person/etc..
+        status:
+          type: string
+          description: The status of this compliance record
+          enum:
+            - ACTIVE
+            - LIMITED
+            - INACTIVE
+            - PENDING
+            - UNKNOWN
+        created_date:
+          description: The date at which the payment will/was settle
+          $ref: '#/components/schemas/DateTime'
+          readOnly: true
+        linked_identities:
+          type: array
+          description: all identities linked to this compliance profile
+          items:
+            type: object
+            $ref: '#/components/schemas/Uuid'
+
+
+    # - IDENTITY -> this is the "main" object for all Person/Organisations
+    identity:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of this record
+          readOnly: true
+        compliance_profile_id:
+          $ref: '#/components/schemas/Uuid'
+          description: UUID of this record
+          readOnly: true
+        external_id:
+          $ref: '#/components/schemas/ExternalRef'
+          description: external (your) ref of this record
+          readOnly: true
+        type:
+          type: string
+          description: The payment type (transfer or payout)
+          example: PERSON
+          enum:
+            - PERSON
+            - ORGANISATION
+        person:
+          $ref: '#/components/schemas/Person'
+          description: |
+            person object -> IF identity is a person
+        organisation:
+          $ref: '#/components/schemas/Organisation'
+          description: |
+            Organisation object -> IF identity is a Organisation
+        addresses:
+          type: array
+          description: address(es) of this identity -> must be at least one
+          items:
+            type: object
+            $ref: '#/components/schemas/Address'
+        telephone:
+          type: array
+          description: telephone(s) of this identity -> must be at least one
+          items:
+            type: object
+            $ref: '#/components/schemas/Telephone'
+        email:
+          type: array
+          description: emails(s) of this identity -> must be at least one
+          items:
+            type: object
+            $ref: '#/components/schemas/Email'
+        ubo:
+          type: array
+          description: the ubo(s) for the person (e.g. parent) or company (e.g.
+          items:
+            type: object
+            $ref: '#/components/schemas/UBO'
+        terms_of_service:
+          type: object
+          $ref: '#/components/schemas/TermsOfService'
+        compliance:
+          type: object
+          $ref: '#/components/schemas/Compliance'
+        audit_dates:
+          description: the dates of certain actions
+          readOnly: true
+          $ref: '#/components/schemas/AuditDates'
+
+
+
+    # ~~~~~~~~~~~~~~~
+    # PAGING AND ERROR OBJECTS
+    # ~~~~~~~~~~~~~~~
+    #standard Error object
+    Error:
+      properties:
+        code:
+          type: string
+          description: The Error code
+        message:
+          type: string
+          description: The Message (human readable).
+        reference:
+          type: string
+          description: |
+            A reference (e.g. UUID) that can be referred to Fondy for investigation.
+            This is an optional field it may or may not be present depending on where issue occurred.
+      required:
+        - code
+        - message
+
+    # the paging logic
+    Page:
+      title: PageObject
+      type: object
+      description: 'Standard items inside of a "page" of results '
+      properties:
+        index:
+          type: integer
+          description: The index of the first element returned, default 0 if not set. This is off the request inbound
+        limit:
+          type: integer
+          description: The limit from the request or default 100 if not set
+        count:
+          type: integer
+          description: The number of elements returned in the items[]
+        has_next:
+          type: boolean
+          description: Whether there is more "pages" of response available
+
+
+
+  # ====================================
+  # Failure Responses
+  # ====================================
+  responses:
+    BadRequest:
+      description: |-
+        Bad Request. The message could not be processed
+        Example types below (list is not exhaustive)
+        <table>
+        <tr><th>Code</th><th>Description</th></tr>
+        <tr><td>BAD_REQUEST</td><td>General indication of a malformed message</td></tr>
+        <tr><td>ACCOUNT_NOT_FOUND</td><td>ID of account is not known in the system</td></tr>
+        <tr><td>UNEXPECTED_CURRENCY</td><td>Trying to use an unsupported currency</td></tr>
+        <tr><td>ACCOUNT_STATUS_INVALID</td>TODO<td>Cannot do this action because account not active</td></tr>
+        </table>
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: |-
+        Returned if a request was made and no valid authentication token was present
+
+        The following error codes may be produced:
+        <table>
+        <tr><th>Code</th><th>Description</th></tr>
+        <tr><td>UNAUTHORISED</td><td>You are not able to perform this action</td></tr>
+        <tr><td>TOKEN_MISSING</td><td>An authentication token is required for access</td></tr>
+        </table>
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: |-
+        Token is valid. But you do not  have permissions to perform the action being undertaken
+        (example read only trying to POST)
+
+        The following error codes may be produced:
+        <table>
+        <tr><th>Code</th><th>Description</th></tr>
+        <tr><td>ACCESS_DENIED</td><td>Token presented IS valid, it has just expired (etc..)</td></tr>
+        <tr><td>INSUFFICIENT_PERMISSIONS</td><td>Permissions do not allow you to undertake this action</td></tr>
+        </table>
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: |-
+        Returned when a requested resource cannot be undertaken because the "object" is not found
+        Example -> invalid account number
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: |-
+        Indicates that the request could not be processed because of conflict in the request
+        The following error codes may be produced:
+
+        <table>
+        <tr><th>Code</th><th>Description</th></tr>
+        <tr><td>EXTERNAL_ID_NOT_UNIQUE</td><td>External identifier must be unique</td></tr>
+        <tr><td>RESOURCE_IN_USE</td><td>The resource cannot be modified as it is referenced by another resource.</td></tr>
+        </table>
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: |-
+        Internal Server Error. The system was unable to handle the request due to an internal error.
+        The following error codes may be produced:
+
+        <table>
+        <tr><th>Code</th><th>Description</th></tr>
+        <tr><td>UNEXPECTED_ERROR</td><td>Unexpected (possibly transient) internal error</td></tr>
+        </table>
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  # ====================================
+  # Standard Header Parameters
+  # ====================================
+  parameters:
+    # Host name to be called/used
+    x-correlation-id:
+      name: Host
+      in: header
+      description: Standard HTTP host header giving a UUID for this specific message
+      required: false
+      schema:
+        type: string
+      example: api.fondy.io:774
+    Host:
+      name: Host
+      in: header
+      description: |
+        Standard HTTP host header giving:
+          * the domain name of the server (for virtual hosting)
+          * and the TCP port number on which the server is listening.
+        (note if standard TCP PORT, this port can be left out)
+      required: false
+      schema:
+        type: string
+      example: api.fondy.io:774
+    Date:
+      name: Date
+      in: header
+      description: |
+        Standard HTTP date header giving (in "HTTP-date" format as defined by RFC 7231 Date/Time Formats)
+        of the originating message.
+      required: false
+      schema:
+        type: string
+      example: 'Tue, 07 Jun 2014 20:51:35 GMT'
+    # index -> for paged results
+    index:
+      name: index
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 0
+      description: Start results at this value for the query
+    # the number of results (limit) to return
+    limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 100
+      description: Return this many responses in the page object
+    # The status of the payment (payments only)
+    PaymentStatus:
+      name: status
+      in: query
+      schema:
+        maxLength: 36
+        minLength: 36
+        type: string
+        enum:
+          - PENDING
+          - SUCCESSFUL
+          - FAILED
+          - REJECTED
+          - SUSPENDED
+      required: false
+    # Everything from this date
+    DateFrom:
+      name: dateFrom
+      in: query
+      schema:
+        type: string
+      example: 'Tue, 07 Jun 2014 20:51:35 GMT'
+      required: false
+    # Everything TO this date
+    DateTo:
+      name: dateTo
+      in: query
+      schema:
+        type: string
+      example: 'Tue, 07 Jun 2014 20:51:35 GMT'
+      required: false
+
+  securitySchemes:
+    # JWT information
+    OAuth2Credentials:
+      type: oauth2
+      description: This API supports OAuth 2.0 Authentication.
+      flows:
+        clientCredentials:
+          tokenUrl: 'https://XXXX.fondy.io'
+          scopes:
+            'account:read': Allows reading of account information
+            'account:create': Allows creation of account
+            'account:update': Allows updating of certain values of account
+            'payment:read': Allows reading of payment information
+            'payment:create': Allows creating a payment
+            'transactions:read': Allows reading of transaction information
+
