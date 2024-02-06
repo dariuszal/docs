@@ -91,6 +91,14 @@
             "api-reference/endpoint/identity/profile-post",
             "api-reference/endpoint/identity/profile-get-by-id"
           ]
+        },
+        {
+          "group": "Plants",
+          "pages": [
+            "api-reference/endpoint/plants/create",
+            "api-reference/endpoint/plants/get",
+            "api-reference/endpoint/plants/delete"
+          ]
         }
       ]
     }
