@@ -84,6 +84,13 @@
             "api-reference/endpoint/identity/identity-get-by-id",
             "api-reference/endpoint/identity/identity-get-all"
           ]
+        },
+        {
+          "group": "Profile",
+          "pages": [
+            "api-reference/endpoint/identity/profile-post",
+            "api-reference/endpoint/identity/profile-get-by-id"
+          ]
         }
       ]
     }
